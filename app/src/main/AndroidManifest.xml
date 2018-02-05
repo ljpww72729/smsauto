@@ -37,11 +37,9 @@
                 android:exported="true">
             <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.SCREEN_ON"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".LiveService"/>
         <service
                 android:name=".MyJobService"
                 android:permission="android.permission.BIND_JOB_SERVICE"
@@ -53,6 +51,17 @@
                 <action android:name="com.wilddog.wilddogauth.signoutsuccess"/>
             </intent-filter>
         </receiver>
+
+        <service
+                android:name=".SmsQSTileService"
+                android:label="@string/app_name"
+                android:icon="@drawable/ic_smsauto_24dp"
+                android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>
