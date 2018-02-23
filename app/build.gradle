@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.ljpww72729.smsauto"
-        minSdkVersion 14
+        minSdkVersion 18
         targetSdkVersion 26
         versionCode 2
         versionName "1.1"
