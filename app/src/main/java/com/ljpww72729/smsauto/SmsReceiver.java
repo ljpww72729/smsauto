@@ -1,14 +1,10 @@
 package com.ljpww72729.smsauto;
 
-import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.telephony.SmsMessage;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -54,45 +50,35 @@ public class SmsReceiver extends BroadcastReceiver {
     }
 
     private void syncSms(SmsMessage[] smsMessage) throws Exception {
-        //创建电话管理
-        TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-        //获取手机号码
-        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: 这里暂未处理
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
+        String phoneNumber = WilddogSyncManager.getPhoneNumber(mContext.getApplicationContext());
+        if (TextUtils.isEmpty(phoneNumber)) {
             return;
-        } else {
-            String phoneNumber = tm.getLine1Number();
-            String messageBody = "";
-            String originatingAddress = "";
-            long messageTime = new Date().getTime();
-            for (SmsMessage message : smsMessage) {
-                messageBody += message.getMessageBody();
-                messageTime = message.getTimestampMillis();
-                originatingAddress = message.getOriginatingAddress();
-            }
-            Log.i(TAG + "MB", messageBody);
-            Log.i(TAG + "OA", originatingAddress);
-            Map<String, String> sms = new HashMap<>();
-            sms.put("messageBody", messageBody);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String formatTime = simpleDateFormat.format(new Date(messageTime));
-            sms.put("messageTime", formatTime);
-            SimpleDateFormat.getDateInstance(SimpleDateFormat.YEAR_FIELD).format(new Date());
-            SimpleDateFormat.getDateInstance(SimpleDateFormat.YEAR_FIELD).format(new Date());
-            SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("yyyy-MM");
-            String formatMonth = simpleDateFormatMonth.format(new Date());
-            // 初始化;
-            SyncReference ref = WilddogSync.getInstance().getReference("smsauto/" + phoneNumber
-                    + "/" + formatMonth + "/" + originatingAddress);
-            ref.push().setValue(sms);
         }
+        String messageBody;
+        String originatingAddress = "";
+        long messageTime = new Date().getTime();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (SmsMessage message : smsMessage) {
+            stringBuilder.append(message.getMessageBody());
+            messageTime = message.getTimestampMillis();
+            originatingAddress = message.getOriginatingAddress();
+        }
+        messageBody = stringBuilder.toString();
+        Log.i(TAG + "MB", messageBody);
+        Log.i(TAG + "OA", originatingAddress);
+        Map<String, String> sms = new HashMap<>();
+        sms.put("messageBody", messageBody);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formatTime = simpleDateFormat.format(new Date(messageTime));
+        sms.put("messageTime", formatTime);
+        SimpleDateFormat simpleDateFormatDay = new SimpleDateFormat("yyyy-MM-dd");
+        String formatDay = simpleDateFormatDay.format(new Date());
+        String[] formatDaySplit = formatDay.split("-");
+        // 初始化;
+        SyncReference ref = WilddogSync.getInstance().getReference("smsauto/" + phoneNumber
+                + "/" + formatDaySplit[0] + "/" + formatDaySplit[1] + "/" + formatDaySplit[2] + "/" + originatingAddress);
+        ref.push().setValue(sms);
 
     }
 

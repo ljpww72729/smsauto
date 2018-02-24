@@ -2,4 +2,5 @@
     <string name="app_name">smsauto</string>
     <string name="ok">OK</string>
     <string name="accessibility_service_description">用于自动开启TeamViewer QuickSupport进行远程控制</string>
+    <string name="no_phone_number">未检测到！</string>
 </resources>

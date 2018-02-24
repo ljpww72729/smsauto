@@ -9,8 +9,28 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="谢谢！"
+            android:text="本机号码："
+            android:textSize="30sp"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@+id/phone_num"/>
+
+    <TextView
+            android:id="@+id/phone_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_phone_number"
             android:textSize="30sp"
             android:layout_centerInParent="true"/>
 
+    <Button
+            android:id="@+id/setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/phone_num"
+            android:layout_centerHorizontal="true"
+            android:text="手动配置"
+            android:visibility="gone"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium.Inverse"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
 </RelativeLayout>

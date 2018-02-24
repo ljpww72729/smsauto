@@ -1,8 +1,11 @@
 package com.ljpww72729.smsauto;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -35,7 +38,7 @@ public class WilddogSyncManager {
             // for ActivityCompat#requestPermissions for more details.
             return;
         } else {
-            final String phoneNum = tm.getLine1Number();
+            final String phoneNum = getPhoneNumber(mContext);
             if (!TextUtils.isEmpty(phoneNum)) {
                 // 监听连接状态
                 SyncReference connectedRef = WilddogSync.getInstance().getReference(".info/connected");
@@ -58,4 +61,25 @@ public class WilddogSyncManager {
             }
         }
     }
+
+    @SuppressLint("MissingPermission")
+    public static String getPhoneNumber(Context mContext) {
+        // 判断是否获取到本机手机号
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String phoneNumber = sharedPreferences.getString(ConstantsStr.PHONE_NUMBER, "");
+        if (TextUtils.isEmpty(phoneNumber)) {
+            TelephonyManager tm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+            phoneNumber = tm.getLine1Number();
+            if (TextUtils.isEmpty(phoneNumber)) {
+                return "";
+            } else {
+                phoneNumber = phoneNumber.replaceFirst("^\\+?86", "");
+                sharedPreferences.edit().putString(ConstantsStr.PHONE_NUMBER, phoneNumber).apply();
+                return phoneNumber;
+            }
+        } else {
+            return phoneNumber.replaceFirst("^\\+?86", "");
+        }
+    }
+
 }
