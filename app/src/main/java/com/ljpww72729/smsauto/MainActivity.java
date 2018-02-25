@@ -22,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
     private String[] permissions = new String[]{Manifest.permission.RECEIVE_SMS,
             Manifest.permission.READ_SMS,
             Manifest.permission.RECEIVE_BOOT_COMPLETED,
-            Manifest.permission.READ_PHONE_STATE};
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.SEND_SMS};
     private TextView phoneNum;
     private Button setting;
     public static final int PERMISSION_CODE = 10001;
@@ -61,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setting.setVisibility(View.GONE);
             phoneNum.setText(phoneNumber);
+            if (!WilddogSyncManager.isServiceRunning(this, SmsSendService.class.getName())) {
+                Intent intentService = new Intent(this, SmsSendService.class);
+                startService(intentService);
+            }
         }
     }
 
@@ -87,7 +92,12 @@ public class MainActivity extends AppCompatActivity {
                 String phoneNumber = data.getStringExtra(ConstantsStr.PHONE_NUMBER);
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 sharedPreferences.edit().putString(ConstantsStr.PHONE_NUMBER, phoneNumber).apply();
+                WilddogSyncManager.initSendSmsStructure(phoneNumber);
                 phoneNum.setText(phoneNumber);
+                if (!WilddogSyncManager.isServiceRunning(this, SmsSendService.class.getName())) {
+                    Intent intentService = new Intent(this, SmsSendService.class);
+                    startService(intentService);
+                }
             } else {
                 setting.setVisibility(View.VISIBLE);
                 Toast.makeText(this, "无手机号无法同步数据！", Toast.LENGTH_LONG).show();

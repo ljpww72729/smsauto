@@ -47,10 +47,13 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
             }
         }
+        if (!WilddogSyncManager.isServiceRunning(arg0, SmsSendService.class.getName())) {
+            Intent intentService = new Intent(arg0, SmsSendService.class);
+            arg0.startService(intentService);
+        }
     }
 
     private void syncSms(SmsMessage[] smsMessage) throws Exception {
-
         String phoneNumber = WilddogSyncManager.getPhoneNumber(mContext.getApplicationContext());
         if (TextUtils.isEmpty(phoneNumber)) {
             return;
@@ -81,5 +84,6 @@ public class SmsReceiver extends BroadcastReceiver {
         ref.push().setValue(sms);
 
     }
+
 
 }

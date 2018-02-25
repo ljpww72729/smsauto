@@ -1,6 +1,7 @@
 package com.ljpww72729.smsauto;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Icon;
 import android.os.Build;
@@ -27,7 +28,24 @@ public class SmsQSTileService extends TileService {
     @Override
     public void onStartListening() {
         Log.i(TAG, "onStartListening: ");
+        // 初始化开关的显示状态
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean tile_switch = sharedPreferences.getBoolean("tile_switch", false);
+        Tile tile = getQsTile();
+        tile.setIcon(Icon.createWithResource(this, R.drawable.ic_smsauto_24dp));
+        tile.setLabel(getString(R.string.app_name));
+        tile.setContentDescription(getString(R.string.app_name));
+        if (tile_switch) {
+            tile.setState(Tile.STATE_ACTIVE);
+        } else {
+            tile.setState(Tile.STATE_INACTIVE);
+        }
+        tile.updateTile();
         WilddogSyncManager.syncConnected(this.getApplicationContext());
+        if (!WilddogSyncManager.isServiceRunning(this, SmsSendService.class.getName())) {
+            Intent intentService = new Intent(this, SmsSendService.class);
+            startService(intentService);
+        }
     }
 
     @Override

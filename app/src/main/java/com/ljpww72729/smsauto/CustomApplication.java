@@ -10,6 +10,9 @@ import com.wilddog.wilddogcore.WilddogOptions;
  */
 
 public class CustomApplication extends Application {
+
+    private static final String TAG = "CustomApplication";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -18,6 +21,5 @@ public class CustomApplication extends Application {
         WilddogApp.initializeApp(this, options);
         //创建一个 SyncReference 实例
         WilddogSyncManager.syncConnected(this);
-
     }
 }
