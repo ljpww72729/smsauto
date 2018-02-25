@@ -19,6 +19,8 @@ import com.wilddog.client.SyncReference;
 import com.wilddog.client.ValueEventListener;
 import com.wilddog.client.WilddogSync;
 
+import java.util.regex.Pattern;
+
 /**
  * 发送短信service
  *
@@ -60,8 +62,15 @@ public class SmsSendService extends Service {
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.exists()) {
                                         SmsInfo smsInfo = (SmsInfo) dataSnapshot.getValue(SmsInfo.class);
-                                        Log.i(TAG, "收件人: " + smsInfo.getAddress() + "，信息:" + smsInfo.getMessage());
-                                        sendSms(smsInfo.getAddress(), smsInfo.getMessage());
+                                        String address = smsInfo.getAddress();
+                                        String message = smsInfo.getMessage();
+                                        Log.i(TAG, "收件人: " + address + "，信息:" + message);
+                                        if (validAddress(address) && !TextUtils.isEmpty(message)) {
+                                            address = address.replaceAll("[- ]", address);
+                                            sendSms(address, message);
+                                        } else {
+                                            sendSync.child("sendResult").setValue("发送失败，请核对收件人及信息");
+                                        }
                                     } else {
                                         sendSync.child("sendResult").setValue("发送失败");
                                     }
@@ -103,6 +112,13 @@ public class SmsSendService extends Service {
         return Service.START_STICKY;
     }
 
+    private boolean validAddress(String address) {
+        if (TextUtils.isEmpty(address) || address.trim().length() == 0) {
+            return false;
+        }
+        address = address.replaceAll("[- ]", address);
+        return Pattern.matches("^\\+?\\d+", address);
+    }
 
     /**
      * 发送短信

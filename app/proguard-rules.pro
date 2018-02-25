@@ -129,3 +129,5 @@
 # 不混淆野狗jar包及野狗的依赖jar包
 -keep class com.wilddog.** {*;}
 -keep class com.fasterxml.** {*;}
+
+-keep class com.ljpww72729.smsauto.SmsInfo {*;}
